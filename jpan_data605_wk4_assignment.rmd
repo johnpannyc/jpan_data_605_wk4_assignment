@@ -1,0 +1,151 @@
+---
+title: "data 605 wk4 assignment"
+author: "Jun Pan"
+date: "February 24, 2019"
+output: html_document
+---
+1. Problem Set 1
+In this problem, we'll verify using R that SVD and Eigenvalues are related as worked out in the weekly module. Given a 3×2 matrix A 
+$$\mathbf{A} = \left[\begin{array}
+{}
+1 & 2 & 3\\
+-1 & 0 & 4\\
+\end{array}\right]
+$$
+
+
+
+(1) write code in R to compute X = AAT and Y = ATA. 
+
+```{r}
+A <- matrix(c(1, -1, 2, 0, 3, 4), nrow = 2, ncol = 3)
+A
+```
+```{r}
+t(A)
+```
+
+Compute X = A*A^T
+```{r}
+X <- A %*% t(A)
+X
+```
+Compute Y = A^TA
+```{r}
+Y <- t(A) %*% A
+Y
+```
+
+
+(2)Then, compute the eigenvalues and eigenvectors of X and Y using the built-in commans in R. 
+Calculate eigenvalues and eigenvectors of X
+```{r}
+eig_X <- eigen(X)
+eig_X
+```
+Calculate eigenvalues and eigenvectors of Y
+```{r}
+eig_Y <- eigen(Y)
+eig_Y
+```
+
+
+
+(3)Then, compute the left-singular, singular values, and right-singular vectors of A using the svd command. 
+```{r}
+svd_A <- svd(A)
+
+left_singular <- svd_A$u
+left_singular
+```
+
+```{r}
+singular_values <- svd_A$d
+singular_values
+```
+
+```{r}
+right_singular <- svd_A$v
+right_singular
+```
+
+
+
+(4)Examine the two sets of singular vectors and show that they are indeed eigenvectors of X and Y. 
+Compare the eigenvector of X with left_singular 
+```{r}
+eig_X
+```
+```{r}
+left_singular
+```
+so the left signular vector is the same of eigen vectors of x
+
+
+
+Compare the eigenvector of Y with right_singular
+```{r}
+eig_Y
+```
+```{r}
+right_singular
+```
+so the right signular vector is the same of eigen vectors of Y
+
+
+
+
+(4)In addition, the two non-zero eigenvalues (the 3rd value will be very close to zero, if not zero) of both X and Y are the same and are squares of the non-zero singular values of A. 
+```{r}
+svd_A$d
+sqrt(eig_X$value)
+sqrt(eig_Y$values)
+```
+
+
+
+
+2. Problem Set 2
+Using the procedure outlined in section 1 of the weekly handout, write a function to compute the inverse of a well-conditioned full-rank square matrix using co-factors. In order to compute the co-factors, you may use built-in commands to compute the determinant. Your function should have the following signature: B = myinverse(A) where A is a matrix and B is its inverse and A×B = I. The o???-diagonal elements of I should be close to zero, if not zero. Likewise, the diagonal elements should be close to 1, if not 1. Small numerical precision errors are acceptable but the function myinverse should be correct and must use co-factors and determinant of A to compute the inverse.
+
+```{r}
+myinverse <- function(A) {
+  C <- diag (nrow(A))
+
+  
+  for (i in 1:nrow ( A )) {
+    for (j in 1:ncol( A )) {
+    C[i,j] <- ( det(A[(-1*i), (-1*j) ]) * ((-1)^(i+j) )  )
+
+    }
+  }
+  T <- diag(nrow(A)) 
+
+  for ( i in 1:nrow(A)) {
+    row <- C[i,]
+    for ( j in 1:length(row)) {
+      T [ j,i ] <- row[j]
+    }
+
+  }
+  inv <- 1/(det(A) ) * T
+  inv
+}
+
+```
+
+
+```{r}
+
+A <- matrix(c(5, 2, 1, -1,1,1,1,2,3) , ncol = 3 , byrow =  TRUE )
+A
+```
+```{r}
+B <- myinverse(A)
+B
+```
+
+
+```{r}
+A %*% B
+```
